@@ -1,12 +1,17 @@
 #!/bin/bash
-export RELEASE="2.2.1"
+export RELEASE="2.23.0"
+
 wget https://github.com/prometheus/prometheus/releases/download/v${RELEASE}/prometheus-${RELEASE}.linux-amd64.tar.gz
+echo "Done Downloding"
 tar xvf prometheus-${RELEASE}.linux-amd64.tar.gz
+echo "done extracting"
 cd prometheus-${RELEASE}.linux-amd64/
+echo " inside prometheus directory"
 groupadd --system prometheus
 useradd -s /sbin/nologin -r -g prometheus prometheus
 mkdir -p /etc/prometheus/{rules,rules.d,files_sd}  /var/lib/prometheus
 cp prometheus promtool /usr/local/bin/
+echo " promethus moved from /usr/locl/bin/"
 cp -r consoles/ console_libraries/ /etc/prometheus/
 echo '[Unit]
 Description=Prometheus systemd service unit
@@ -18,7 +23,7 @@ Type=simple
 User=prometheus
 Group=prometheus
 ExecReload=/bin/kill -HUP $MAINPID
-ExecStart=/usr/local/bin/prometheus \
+ExecStart=/bin/bash /usr/local/bin/prometheus \
 --config.file=/etc/prometheus/prometheus.yml \
 --storage.tsdb.path=/var/lib/prometheus \
 --web.console.templates=/etc/prometheus/consoles \
@@ -46,9 +51,7 @@ scrape_configs:
 
 static_configs:
  - targets: ['localhost:9090']">/etc/prometheus/prometheus.yml
- chown -R prometheus:prometheus /etc/prometheus/  /var/lib/prometheus/
- chmod -R 775 /etc/prometheus/ /var/lib/prometheus/
- # start and enable premethoues
- systemctl start prometheus
- systemctl enable prometheus
+chown -R prometheus:prometheus /etc/prometheus/  /var/lib/prometheus/
+chmod -R 775 /etc/prometheus/ /var/lib/prometheus/
 
+echo 'instalation completed'
